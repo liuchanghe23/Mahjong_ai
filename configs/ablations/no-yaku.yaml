@@ -1,0 +1,8 @@
+version: 2
+name: baseline-no-yaku
+base: ../baseline.yaml
+weight_overrides:
+  yaku_yakuhai_delta: 0.0
+  yaku_tanyao_delta: 0.0
+  yaku_chiitoitsu_delta: 0.0
+  yaku_flush_delta: 0.0

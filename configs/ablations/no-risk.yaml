@@ -1,0 +1,5 @@
+version: 2
+name: baseline-no-risk
+base: ../baseline.yaml
+weight_overrides:
+  discard_risk: 0.0

@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.log
+*.egg-info/
+artifacts/
+
+# Third-party source checkouts are managed separately.
+vendor/

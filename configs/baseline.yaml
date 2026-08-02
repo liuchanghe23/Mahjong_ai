@@ -1,0 +1,80 @@
+version: 2
+name: baseline-v1
+shape_mode: decomposition
+
+policy:
+  always_win: true
+  always_riichi: true
+  conservative_calls: true
+
+weights:
+  ukeire_count: 6.0
+  ukeire_types: 3.0
+  complete_meld: 0.5
+  required_ryanmen: 2.0
+  required_kanchan: 0.7
+  required_penchan: 0.5
+  head_pair: 1.1
+  extra_pair: 0.8
+  unused_middle: -0.2
+  unused_near_terminal: -0.4
+  unused_terminal: -0.7
+  unused_honor: -0.8
+  shape_flexibility: 0.3
+  legacy_value_honor_pair: 0.9
+  retained_dora: 4.0
+  retained_red: 4.5
+  discard_risk: -8.0
+  yaku_yakuhai_delta: 4.0
+  yaku_tanyao_delta: 4.0
+  yaku_chiitoitsu_delta: 4.0
+  yaku_flush_delta: 4.0
+
+group_weights:
+  efficiency: 1.0
+  value: 1.0
+  shape: 1.0
+  risk: 1.0
+
+normalization:
+  ukeire_count: 40.0
+  ukeire_types: 34.0
+  hand_tiles: 13.0
+  yaku_potential: 2.0
+
+risk_context:
+  early: 0.60
+  middle: 1.00
+  late: 1.50
+  two_threats: 1.35
+  three_threats: 1.60
+  dealer_threat: 1.25
+  self_tenpai: 0.55
+  self_one_shanten: 0.80
+  high_value_hand: 0.75
+
+yaku:
+  shanten_probability:
+    ready: 1.00
+    one: 0.75
+    two: 0.45
+    three: 0.20
+    far: 0.08
+  yakuhai:
+    pair_probability: 0.55
+    single_probability: 0.12
+  tanyao:
+    forbidden_tile_penalty: 0.22
+  flush:
+    off_suit_penalty: 0.18
+    honor_penalty_for_chinitsu: 0.25
+
+danger:
+  genbutsu: 0.00
+  honor_three_visible: 0.02
+  honor_two_visible: 0.06
+  honor_one_visible: 0.18
+  honor_live: 0.30
+  terminal: 0.20
+  near_terminal: 0.35
+  middle: 0.50

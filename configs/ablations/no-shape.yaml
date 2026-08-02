@@ -1,0 +1,16 @@
+version: 2
+name: baseline-no-shape
+base: ../baseline.yaml
+weight_overrides:
+  complete_meld: 0.0
+  required_ryanmen: 0.0
+  required_kanchan: 0.0
+  required_penchan: 0.0
+  head_pair: 0.0
+  extra_pair: 0.0
+  unused_middle: 0.0
+  unused_near_terminal: 0.0
+  unused_terminal: 0.0
+  unused_honor: 0.0
+  shape_flexibility: 0.0
+  legacy_value_honor_pair: 0.0

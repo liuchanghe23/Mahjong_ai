@@ -1,0 +1,9 @@
+version: 2
+name: baseline-no-all-yaku
+base: ../baseline.yaml
+weight_overrides:
+  legacy_value_honor_pair: 0.0
+  yaku_yakuhai_delta: 0.0
+  yaku_tanyao_delta: 0.0
+  yaku_chiitoitsu_delta: 0.0
+  yaku_flush_delta: 0.0
