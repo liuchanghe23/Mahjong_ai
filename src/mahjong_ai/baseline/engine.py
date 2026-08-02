@@ -8,8 +8,8 @@ import riichienv.convert as convert
 
 from mahjong_ai.baseline.config import BaselineConfig, default_config_path, load_config
 from mahjong_ai.baseline.decision import CandidateEvaluation, DecisionRecord
-from mahjong_ai.baseline.features import extract_discard_features
-from mahjong_ai.baseline.scoring import aggregate_group_contributions, linear_score
+from mahjong_ai.baseline.features import FeaturePipeline
+from mahjong_ai.baseline.scoring import aggregate_group_contributions, select_best_variant
 from mahjong_ai.baseline.state import PublicState
 
 
@@ -18,6 +18,7 @@ class BaselineEngine:
 
     def __init__(self, config_path: Path | None = None) -> None:
         self.config: BaselineConfig = load_config(config_path or default_config_path())
+        self._features = FeaturePipeline.from_config(self.config)
         self.last_decision: DecisionRecord | None = None
         self._pending_riichi = False
 
@@ -90,27 +91,10 @@ class BaselineEngine:
     ) -> Action:
         state = state or PublicState.from_observation(observation)
         evaluated: list[tuple[Action, CandidateEvaluation]] = []
-        yaku_names = {
-            "yaku_yakuhai_delta", "yaku_tanyao_delta",
-            "yaku_chiitoitsu_delta", "yaku_flush_delta",
-        }
-        shape_names = {
-            "complete_meld", "required_ryanmen", "required_kanchan",
-            "required_penchan", "head_pair", "extra_pair", "unused_middle",
-            "unused_near_terminal", "unused_terminal", "unused_honor",
-            "shape_flexibility", "legacy_value_honor_pair",
-        }
-        yaku_config = self.config.yaku if any(self.config.weights[name] for name in yaku_names) else None
-        compute_shape = bool(self.config.group_weights["shape"]) and any(
-            self.config.weights[name] for name in shape_names
-        )
         for action in actions:
-            features = extract_discard_features(
-                action.tile, state, self.config.danger, yaku_config,
-                self.config.normalization, self.config.risk_context,
-                self.config.shape_mode, compute_shape,
+            score, contributions, features = select_best_variant(
+                self._features.extract_candidates(action.tile, state), self.config
             )
-            score, contributions = linear_score(features, self.config)
             tile_name = convert.tid_to_mjai(action.tile)
             yaku_improvements = []
             if features.yaku is not None:

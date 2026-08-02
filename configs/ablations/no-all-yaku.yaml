@@ -1,4 +1,4 @@
-version: 2
+version: 3
 name: baseline-no-all-yaku
 base: ../baseline.yaml
 weight_overrides:

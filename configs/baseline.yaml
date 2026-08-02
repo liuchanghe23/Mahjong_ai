@@ -1,5 +1,5 @@
-version: 2
-name: baseline-v1
+version: 3
+name: baseline-v3-structured
 shape_mode: decomposition
 
 policy:
@@ -11,16 +11,15 @@ weights:
   ukeire_count: 6.0
   ukeire_types: 3.0
   complete_meld: 0.5
-  required_ryanmen: 2.0
-  required_kanchan: 0.7
-  required_penchan: 0.5
+  ryanmen_taatsu: 2.0
+  kanchan_taatsu: 0.7
+  penchan_taatsu: 0.5
   head_pair: 1.1
   extra_pair: 0.8
   unused_middle: -0.2
   unused_near_terminal: -0.4
   unused_terminal: -0.7
   unused_honor: -0.8
-  shape_flexibility: 0.3
   legacy_value_honor_pair: 0.9
   retained_dora: 4.0
   retained_red: 4.5

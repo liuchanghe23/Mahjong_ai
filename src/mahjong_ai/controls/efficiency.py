@@ -7,8 +7,8 @@ from typing import Any
 
 from riichienv import Action, ActionType, Observation
 
-from mahjong_ai.baseline.config import default_config_path, load_config
-from mahjong_ai.baseline.features import extract_discard_features
+from mahjong_ai.baseline.efficiency_features import extract_efficiency
+from mahjong_ai.baseline.features import remove_one_tile
 from mahjong_ai.baseline.state import PublicState
 
 
@@ -31,9 +31,9 @@ class EfficiencyEngine:
     """Deterministic control: win, riichi, never call, maximize tile efficiency."""
 
     def __init__(self, config_path: Path | None = None) -> None:
-        # Danger values are needed by the shared pure feature extractor, but
-        # this engine deliberately never reads the resulting risk feature.
-        self._danger = load_config(config_path or default_config_path()).danger
+        # Retain the optional argument for API compatibility; this control
+        # intentionally has no trainable configuration.
+        _ = config_path
         self._pending_riichi = False
         self.last_decision: EfficiencyDecision | None = None
 
@@ -80,7 +80,8 @@ class EfficiencyEngine:
     def _choose_discard(self, state: PublicState, actions: list[Action]) -> Action:
         evaluated: list[tuple[Action, EfficiencyCandidate]] = []
         for action in actions:
-            features = extract_discard_features(action.tile, state, self._danger, compute_shape=False)
+            remaining = remove_one_tile(state.hand, action.tile)
+            features = extract_efficiency(remaining, state.visible_counts)
             evaluated.append(
                 (
                     action,

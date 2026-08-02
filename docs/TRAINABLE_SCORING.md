@@ -46,9 +46,9 @@ normalized_risk = base_danger
 
 ## 不重叠牌形分解
 
-牌形模块枚举顺子、刻子、对子、两面、嵌张、边张和单张的合法组合，每张牌在一种分解中最多使用一次。模型选择结构质量最高的分解，并用次优分解相对最优分解的质量生成`shape_flexibility`。
+牌形识别器枚举顺子、刻子、对子、两面、嵌张、边张和单张的全部唯一合法特征组合，每张牌在一种分解中最多使用一次。识别器不包含结构价值常数，也不自行选择最优路线。
 
-搭子数量受`4 - complete_meld`限制，超过和牌结构需求的搭子不会继续获得完整奖励。输出特征为`complete_meld`、三种必要搭子、`head_pair`、`extra_pair`、四类`unused_*`和`shape_flexibility`。四类未使用牌直接来自同一个最优分解，旧版独立孤张扫描已经移除。
+评分器使用`baseline.yaml`中的正式可训练权重对同一弃牌的每一种分解分别评分，并选择分数最高的分解。输出特征为`complete_meld`、三种`*_taatsu`、`head_pair`、`extra_pair`和四类`unused_*`。四类未使用牌直接来自对应分解，旧版独立孤张扫描已经移除。
 
 `configs/ablations/legacy-overlap-shape.yaml`保留旧的重叠扫描模式，仅用于同种子对照实验。
 
@@ -62,4 +62,4 @@ normalized_risk = base_danger
 
 每条候选记录包含`features`、`normalized_features`、`contributions`和`group_contributions`。后续训练数据应保存这些字段以及最终对局结果，而不只保存模型选中的动作。
 
-配置版本已提升为2，旧版配置应明确迁移，不能静默混用。
+配置版本已提升为3，旧版配置应明确迁移，不能静默混用。

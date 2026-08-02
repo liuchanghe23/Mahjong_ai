@@ -12,7 +12,12 @@ BaselineEngine 是一个可解释、可复现、参数可训练的立直麻将�
 Observation
    │
    ├─ state.py      只提取公开状态
-   ├─ features.py   只计算候选动作特征
+   ├─ features.py   只编排各特征提取器
+   ├─ efficiency_features.py  向听数和有效牌
+   ├─ shape_features.py       不重叠牌形
+   ├─ value_features.py       宝牌和役潜力
+   ├─ risk_features.py        危险度和局面倍率
+   ├─ feature_registry.py     特征名称、分组和归一化尺度
    ├─ scoring.py    执行归一化后的分组加权
    ├─ engine.py     只负责动作优先级和选择
    └─ decision.py   保存候选、贡献值和解释
@@ -22,6 +27,8 @@ configs/baseline.yaml
 ```
 
 规则、特征和权重有意分离：规则决定动作是否参与比较；特征描述动作造成的状态变化；权重表达特征的重要程度。
+
+所有特征元数据只在`feature_registry.py`登记一次。配置严格校验、归一化、分组评分和按组启停均读取该注册表。新增特征不再需要在配置加载器、评分器和引擎中分别维护名称列表。
 
 ## 3. 硬规则决策顺序
 
@@ -180,7 +187,7 @@ yaku_chiitoitsu_delta, yaku_flush_delta
 
 ## 13. 配置约束
 
-`configs/baseline.yaml` 当前使用版本2。加载器执行严格校验：
+`configs/baseline.yaml` 当前使用版本3。加载器执行严格校验：
 
 - 未知字段直接报错；
 - 缺少权重直接报错；
