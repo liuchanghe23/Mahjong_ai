@@ -13,6 +13,11 @@ class FeatureSpec:
 FEATURE_SPECS = (
     FeatureSpec("ukeire_count", "efficiency", "ukeire_count"),
     FeatureSpec("ukeire_types", "efficiency", "ukeire_types"),
+    FeatureSpec("lookahead_win_probability", "efficiency"),
+    FeatureSpec("lookahead_tenpai_probability", "efficiency"),
+    FeatureSpec("lookahead_wide_wait_probability", "efficiency"),
+    FeatureSpec("lookahead_furiten_probability", "efficiency"),
+    FeatureSpec("lookahead_expected_ukeire", "efficiency", "ukeire_count"),
     FeatureSpec("retained_dora", "value", "hand_tiles"),
     FeatureSpec("retained_red", "value", "hand_tiles"),
     FeatureSpec("yaku_yakuhai_delta", "value", "yaku_potential"),

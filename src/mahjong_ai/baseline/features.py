@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from mahjong_ai.baseline.config import BaselineConfig, YakuConfig
 from mahjong_ai.baseline.efficiency_features import extract_efficiency
 from mahjong_ai.baseline.feature_registry import feature_names, normalize_features
+from mahjong_ai.baseline.lookahead_features import extract_lookahead
 from mahjong_ai.baseline.risk_features import discard_danger, scale_risk
 from mahjong_ai.baseline.shape_features import extract_shape_candidates
 from mahjong_ai.baseline.state import PublicState
@@ -48,6 +49,7 @@ class FeaturePipeline:
     risk_context: dict[str, float] | None
     shape_mode: str
     compute_shape: bool
+    compute_lookahead: bool
 
     @classmethod
     def from_config(cls, config: BaselineConfig) -> "FeaturePipeline":
@@ -55,6 +57,9 @@ class FeaturePipeline:
             name for name in feature_names("value") if name.startswith("yaku_")
         )
         shape_names = feature_names("shape")
+        lookahead_names = frozenset(
+            name for name in feature_names("efficiency") if name.startswith("lookahead_")
+        )
         return cls(
             danger=config.danger,
             yaku_config=(
@@ -65,6 +70,8 @@ class FeaturePipeline:
             shape_mode=config.shape_mode,
             compute_shape=bool(config.group_weights["shape"])
             and any(config.weights[name] for name in shape_names),
+            compute_lookahead=bool(config.group_weights["efficiency"])
+            and any(config.weights[name] for name in lookahead_names),
         )
 
     def extract(self, tile_id: int, state: PublicState) -> CandidateFeatures:
@@ -82,6 +89,7 @@ class FeaturePipeline:
             risk_context=self.risk_context,
             shape_mode=self.shape_mode,
             compute_shape=self.compute_shape,
+            compute_lookahead=self.compute_lookahead,
         )
 
 
@@ -94,11 +102,12 @@ def extract_discard_features(
     risk_context: dict[str, float] | None = None,
     shape_mode: str = "decomposition",
     compute_shape: bool = True,
+    compute_lookahead: bool = False,
 ) -> CandidateFeatures:
     """Compatibility wrapper for tests and lightweight custom callers."""
     return _extract_candidates(
         tile_id, state, danger, yaku_config, normalization or DEFAULT_NORMALIZATION,
-        risk_context, shape_mode, compute_shape,
+        risk_context, shape_mode, compute_shape, compute_lookahead,
     )[0]
 
 
@@ -111,10 +120,15 @@ def _extract_candidates(
     risk_context: dict[str, float] | None,
     shape_mode: str,
     compute_shape: bool,
+    compute_lookahead: bool,
 ) -> tuple[CandidateFeatures, ...]:
     remaining_hand = remove_one_tile(state.hand, tile_id)
     efficiency = extract_efficiency(remaining_hand, state.visible_counts)
     common_values = efficiency.values()
+    if compute_lookahead:
+        common_values.update(
+            extract_lookahead(remaining_hand, state, tile_kind(tile_id)).values()
+        )
 
     value_features, yaku_delta = extract_value(
         state.hand, remaining_hand, state, yaku_config

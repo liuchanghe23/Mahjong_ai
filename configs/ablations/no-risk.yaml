@@ -1,4 +1,4 @@
-version: 3
+version: 4
 name: baseline-no-risk
 base: ../baseline.yaml
 weight_overrides:

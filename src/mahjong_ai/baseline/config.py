@@ -87,7 +87,7 @@ def load_config(path: Path) -> BaselineConfig:
     # baseline in one place prevents unrelated parameters drifting between
     # experiments.
     if set(raw) <= {"version", "name", "base", "weight_overrides", "shape_mode"} and "base" in raw:
-        if raw.get("version") != 3:
+        if raw.get("version") != 4:
             raise ValueError(f"Unsupported baseline configuration version: {raw.get('version')!r}")
         overrides = raw.get("weight_overrides", {})
         if not isinstance(overrides, dict):
@@ -102,7 +102,7 @@ def load_config(path: Path) -> BaselineConfig:
         if not all(isfinite(value) for value in weights.values()):
             raise ValueError("weight_overrides values must be finite")
         return BaselineConfig(
-            version=3,
+            version=4,
             name=str(raw.get("name", path.stem)),
             policy=base.policy,
             weights=weights,
@@ -122,7 +122,7 @@ def load_config(path: Path) -> BaselineConfig:
     unknown = set(raw) - allowed
     if unknown:
         raise ValueError(f"Unknown configuration sections: {sorted(unknown)}")
-    if raw.get("version") != 3:
+    if raw.get("version") != 4:
         raise ValueError(f"Unsupported baseline configuration version: {raw.get('version')!r}")
 
     policy_raw = raw.get("policy")
@@ -169,7 +169,7 @@ def load_config(path: Path) -> BaselineConfig:
         raise ValueError("shape_mode must be decomposition or legacy_overlap")
 
     return BaselineConfig(
-        version=3,
+        version=4,
         name=str(raw.get("name", "baseline")),
         policy=PolicyConfig(**{key: bool(policy_raw[key]) for key in policy_keys}),
         weights=_strict_numeric_map(raw.get("weights"), REQUIRED_WEIGHTS, "weights"),

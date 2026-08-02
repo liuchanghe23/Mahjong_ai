@@ -1,0 +1,9 @@
+version: 4
+name: baseline-no-lookahead
+base: ../baseline.yaml
+weight_overrides:
+  lookahead_win_probability: 0.0
+  lookahead_tenpai_probability: 0.0
+  lookahead_wide_wait_probability: 0.0
+  lookahead_furiten_probability: 0.0
+  lookahead_expected_ukeire: 0.0

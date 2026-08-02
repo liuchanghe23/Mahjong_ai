@@ -1,5 +1,5 @@
-version: 3
-name: baseline-v3-structured
+version: 4
+name: baseline-v4-lookahead
 shape_mode: decomposition
 
 policy:
@@ -10,6 +10,11 @@ policy:
 weights:
   ukeire_count: 6.0
   ukeire_types: 3.0
+  lookahead_win_probability: 4.0
+  lookahead_tenpai_probability: 2.0
+  lookahead_wide_wait_probability: 1.0
+  lookahead_furiten_probability: -2.0
+  lookahead_expected_ukeire: 2.0
   complete_meld: 0.5
   ryanmen_taatsu: 2.0
   kanchan_taatsu: 0.7

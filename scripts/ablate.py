@@ -8,7 +8,7 @@ from mahjong_ai.evaluation import run_comparison
 
 
 ABLATIONS = (
-    "no-risk", "no-yaku", "no-dora", "no-shape",
+    "no-risk", "no-yaku", "no-dora", "no-shape", "no-lookahead",
     "no-all-yaku", "legacy-overlap-shape",
 )
 

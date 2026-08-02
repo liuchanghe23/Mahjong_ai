@@ -8,7 +8,7 @@ from mahjong_ai.baseline.config import default_config_path, load_config
 def test_default_config_is_complete() -> None:
     config = load_config(default_config_path())
 
-    assert config.version == 3
+    assert config.version == 4
     assert "shanten" not in config.weights
     assert config.weights["ukeire_count"] > 0
     assert set(config.group_weights) == {"efficiency", "value", "shape", "risk"}

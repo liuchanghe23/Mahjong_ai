@@ -14,6 +14,7 @@ Observation
    ├─ state.py      只提取公开状态
    ├─ features.py   只编排各特征提取器
    ├─ efficiency_features.py  向听数和有效牌
+   ├─ lookahead_features.py   公开信息一巡Expectimax
    ├─ shape_features.py       不重叠牌形
    ├─ value_features.py       宝牌和役潜力
    ├─ risk_features.py        危险度和局面倍率
@@ -187,7 +188,7 @@ yaku_chiitoitsu_delta, yaku_flush_delta
 
 ## 13. 配置约束
 
-`configs/baseline.yaml` 当前使用版本3。加载器执行严格校验：
+`configs/baseline.yaml` 当前使用版本4。加载器执行严格校验：
 
 - 未知字段直接报错；
 - 缺少权重直接报错；

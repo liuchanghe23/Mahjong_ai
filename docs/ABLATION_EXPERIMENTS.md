@@ -10,6 +10,7 @@
 - `no-yaku`：关闭四类役潜力增量。
 - `no-all-yaku`：在 `no-yaku` 基础上关闭役牌对子形状奖励。
 - `no-dora`：关闭宝牌与赤宝牌保留奖励。
+- `no-lookahead`：关闭一巡Expectimax有效牌质量特征。
 - `no-shape`：关闭两面、嵌张、边张、对子与役牌对子形状奖励。
 - 历史报告中的`no-isolated`已停止使用：旧孤张扫描已被结构分解中的四类`unused_*`惩罚替代。
 

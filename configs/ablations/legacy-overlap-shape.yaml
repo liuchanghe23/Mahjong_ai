@@ -1,4 +1,4 @@
-version: 3
+version: 4
 name: baseline-legacy-overlap-shape
 base: ../baseline.yaml
 shape_mode: legacy_overlap
