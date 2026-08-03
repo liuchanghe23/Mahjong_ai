@@ -1,0 +1,29 @@
+version: 1
+name: stage1-group-weights
+base_config: baseline.yaml
+seed_sets: seed-sets.yaml
+
+evaluation:
+  game_mode: 4p-red-east
+  objective: average_rank_improvement
+  budgets: [60, 300, 600]
+
+parameters:
+  shape_group:
+    path: group_weights.shape
+    initial: 1.0
+    min: 0.0
+    max: 2.0
+    scale: linear
+  value_group:
+    path: group_weights.value
+    initial: 1.0
+    min: 0.0
+    max: 2.0
+    scale: linear
+  risk_group:
+    path: group_weights.risk
+    initial: 1.0
+    min: 0.5
+    max: 3.0
+    scale: linear

@@ -1,0 +1,11 @@
+version: 1
+sets:
+  train:
+    base_seed: 100000
+    matches: 600
+  selection:
+    base_seed: 110000
+    matches: 1002
+  validation:
+    base_seed: 120000
+    matches: 3000

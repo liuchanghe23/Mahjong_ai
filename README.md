@@ -47,6 +47,8 @@ python -m venv .venv
 
 硬向听优先级、特征归一化、模块权重和风险上下文训练接口见 [`docs/TRAINABLE_SCORING.md`](docs/TRAINABLE_SCORING.md)。
 
+训练基线、参数约束、种子隔离和候选配置快照见 [`docs/TRAINING_INFRASTRUCTURE.md`](docs/TRAINING_INFRASTRUCTURE.md)。
+
 固定种子评测、2对2座位轮换、指标口径和报告格式见 [`docs/EVALUATION_FRAMEWORK.md`](docs/EVALUATION_FRAMEWORK.md)。
 
 消融配置、东风战实验流程与配对 Bootstrap 统计见 [`docs/ABLATION_EXPERIMENTS.md`](docs/ABLATION_EXPERIMENTS.md)。

@@ -16,8 +16,12 @@ from mahjong_ai.baseline.state import PublicState
 class BaselineEngine:
     """Hard-rule action selection followed by explainable discard scoring."""
 
-    def __init__(self, config_path: Path | None = None) -> None:
-        self.config: BaselineConfig = load_config(config_path or default_config_path())
+    def __init__(
+        self, config_path: Path | None = None, *, config: BaselineConfig | None = None
+    ) -> None:
+        if config_path is not None and config is not None:
+            raise ValueError("Provide either config_path or config, not both")
+        self.config = config or load_config(config_path or default_config_path())
         self._features = FeaturePipeline.from_config(self.config)
         self.last_decision: DecisionRecord | None = None
         self._pending_riichi = False
