@@ -79,3 +79,13 @@
 ```
 
 默认使用7个工作进程，输出到`artifacts/training/group-weight-ablation-v1/`。其中`summary.md`按参数给出趋势表，`summary.json`保留完整机器可读结果。重复运行同一命令会跳过已经完成的候选；正式运行同样要求Git工作区干净。
+
+## 独立种子参数复测
+
+单变量消融选出的候选必须在未参与训练的种子上复测。以下命令使用`selection`的1002个镜像配对种子（实际2004局）比较`value_group=0.5`与训练基线：
+
+```powershell
+.\.venv\Scripts\python scripts\validate_parameter.py
+```
+
+默认输出到`artifacts/training/value-0.5-selection/`。入口也可通过`--parameter`、`--value`、`--seed-set`和`--matches`复测其他参数；相同输出目录具备严格清单校验和完成结果复用。
