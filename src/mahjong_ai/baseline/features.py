@@ -77,6 +77,21 @@ class FeaturePipeline:
     def extract(self, tile_id: int, state: PublicState) -> CandidateFeatures:
         return self.extract_candidates(tile_id, state)[0]
 
+    def preview_efficiency(self, tile_id: int, state: PublicState) -> CandidateFeatures:
+        """Cheap first-stage features used before hard shanten pruning."""
+        efficiency = extract_efficiency(
+            remove_one_tile(state.hand, tile_id), state.visible_counts
+        )
+        values = efficiency.values()
+        return CandidateFeatures(
+            values=values,
+            normalized_values=normalize_features(values, self.normalization),
+            shanten=efficiency.shanten,
+            ukeire_kinds=efficiency.ukeire_kinds,
+            ukeire_count=efficiency.ukeire_count,
+            danger=0.0,
+        )
+
     def extract_candidates(
         self, tile_id: int, state: PublicState
     ) -> tuple[CandidateFeatures, ...]:

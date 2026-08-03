@@ -91,7 +91,38 @@ class BaselineEngine:
     ) -> Action:
         state = state or PublicState.from_observation(observation)
         evaluated: list[tuple[Action, CandidateEvaluation]] = []
-        for action in actions:
+        previews = [
+            (action, self._features.preview_efficiency(action.tile, state))
+            for action in actions
+        ]
+        minimum_shanten = min(features.shanten for _, features in previews)
+        for action, preview in previews:
+            if preview.shanten > minimum_shanten:
+                tile_name = convert.tid_to_mjai(action.tile)
+                evaluated.append((
+                    action,
+                    CandidateEvaluation(
+                        action=json.loads(action.to_mjai()),
+                        score=0.0,
+                        features=preview.values,
+                        normalized_features=preview.normalized_values,
+                        contributions={},
+                        group_contributions={
+                            name: 0.0 for name in self.config.group_weights
+                        },
+                        shanten=preview.shanten,
+                        ukeire_kinds=preview.ukeire_kinds,
+                        ukeire_count=preview.ukeire_count,
+                        danger=0.0,
+                        reasons=(
+                            f"切{tile_name}后为{preview.shanten}向听",
+                            f"高于最低{minimum_shanten}向听，跳过昂贵特征",
+                        ),
+                        pruned=True,
+                        prune_reason="higher_shanten",
+                    ),
+                ))
+                continue
             score, contributions, features = select_best_variant(
                 self._features.extract_candidates(action.tile, state), self.config
             )

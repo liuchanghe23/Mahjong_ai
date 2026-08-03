@@ -65,6 +65,20 @@ def test_engine_records_ranked_discard_candidates() -> None:
     }
 
 
+def test_higher_shanten_candidates_are_pruned_before_expensive_features() -> None:
+    observation = next(iter(RiichiEnv(seed=1).reset().values()))
+    engine = BaselineEngine()
+
+    engine.act(observation)
+    decision = engine.last_decision
+
+    assert decision is not None
+    pruned = [candidate for candidate in decision.candidates if candidate.pruned]
+    assert pruned
+    assert all(candidate.prune_reason == "higher_shanten" for candidate in pruned)
+    assert all(candidate.shanten > decision.candidates[0].shanten for candidate in pruned)
+
+
 def test_shanten_has_dominant_weight() -> None:
     env = RiichiEnv(seed=12, rule=GameRule.default_mjsoul())
     observation = next(iter(env.reset().values()))

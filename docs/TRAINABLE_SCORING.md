@@ -68,4 +68,6 @@ normalized_risk = base_danger
 
 搜索输出下一巡和牌、听牌、宽听、振听概率与后继有效牌期望。宽听当前定义为至少2种等待且公开剩余至少6枚；振听检查既有自家牌河以及当前候选弃牌。`configs/ablations/no-lookahead.yaml`可关闭全部搜索特征，用于测量搜索本身的价值和耗时。
 
+性能实现将34种代表牌预计算，并分别缓存`counts34 → shanten`与`counts34 → improving_kinds`。普通弃牌先只计算向听数，只有最低向听候选才进入Lookahead、牌形、役和风险模块；较高向听候选仍写入决策记录，并标记`pruned: true`与`prune_reason: higher_shanten`。
+
 配置版本已提升为4，旧版配置应明确迁移，不能静默混用。

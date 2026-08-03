@@ -3,6 +3,7 @@ from riichienv import GameRule, RiichiEnv
 from mahjong_ai.baseline.config import default_config_path, load_config
 from mahjong_ai.baseline.feature_registry import FEATURE_BY_NAME, FEATURE_GROUPS, feature_names
 from mahjong_ai.baseline.features import FeaturePipeline
+from mahjong_ai.baseline.efficiency_features import improving_kinds
 from mahjong_ai.baseline.state import PublicState
 
 
@@ -33,3 +34,14 @@ def test_no_shape_configuration_disables_shape_extractor() -> None:
     pipeline = FeaturePipeline.from_config(load_config(path))
 
     assert pipeline.compute_shape is False
+
+
+def test_improving_kinds_are_cached_by_hand_structure() -> None:
+    counts = (1, 1, 1, 0, 0, 0, 0, 0, 0) + (0,) * 25
+    improving_kinds.cache_clear()
+
+    first = improving_kinds(counts)
+    second = improving_kinds(counts)
+
+    assert second == first
+    assert improving_kinds.cache_info().hits == 1

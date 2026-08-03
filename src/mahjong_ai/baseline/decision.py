@@ -21,6 +21,8 @@ class CandidateEvaluation:
     reasons: tuple[str, ...]
     yaku_before: tuple[YakuEvaluation, ...] = ()
     yaku_after: tuple[YakuEvaluation, ...] = ()
+    pruned: bool = False
+    prune_reason: str | None = None
 
 
 @dataclass(frozen=True)

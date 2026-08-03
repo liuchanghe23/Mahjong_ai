@@ -8,6 +8,9 @@ from riichienv import calculate_shanten
 from mahjong_ai.baseline.tiles import canonical_tile_id, counts34
 
 
+CANONICAL_TILE_IDS = tuple(canonical_tile_id(kind) for kind in range(34))
+
+
 @dataclass(frozen=True)
 class EfficiencyFeatures:
     shanten: int
@@ -22,7 +25,7 @@ class EfficiencyFeatures:
 
 
 def _hand_from_counts(counts: tuple[int, ...]) -> list[int]:
-    return [canonical_tile_id(kind) for kind, count in enumerate(counts) for _ in range(count)]
+    return [CANONICAL_TILE_IDS[kind] for kind, count in enumerate(counts) for _ in range(count)]
 
 
 @lru_cache(maxsize=500_000)
@@ -31,21 +34,27 @@ def shanten_from_counts(counts: tuple[int, ...]) -> int:
 
 
 @lru_cache(maxsize=500_000)
-def extract_efficiency_counts(
-    counts: tuple[int, ...], visible_counts: tuple[int, ...]
-) -> EfficiencyFeatures:
+def improving_kinds(counts: tuple[int, ...]) -> tuple[int, ...]:
     shanten = shanten_from_counts(counts)
     kinds: list[int] = []
-    remaining = 0
     for kind in range(34):
-        if visible_counts[kind] >= 4:
+        if counts[kind] >= 4:
             continue
         added = list(counts)
         added[kind] += 1
         if shanten_from_counts(tuple(added)) < shanten:
             kinds.append(kind)
-            remaining += 4 - visible_counts[kind]
-    return EfficiencyFeatures(shanten, tuple(kinds), remaining)
+    return tuple(kinds)
+
+
+@lru_cache(maxsize=500_000)
+def extract_efficiency_counts(
+    counts: tuple[int, ...], visible_counts: tuple[int, ...]
+) -> EfficiencyFeatures:
+    shanten = shanten_from_counts(counts)
+    kinds = tuple(kind for kind in improving_kinds(counts) if visible_counts[kind] < 4)
+    remaining = sum(4 - visible_counts[kind] for kind in kinds)
+    return EfficiencyFeatures(shanten, kinds, remaining)
 
 
 def extract_efficiency(hand: list[int], visible_counts: tuple[int, ...]) -> EfficiencyFeatures:
