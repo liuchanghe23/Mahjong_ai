@@ -1,0 +1,21 @@
+* text=auto
+.gitattributes text eol=lf
+
+# Keep source code, configuration, and documentation consistent across
+# Windows, WSL, and Linux environments.
+*.py text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.ps1 text eol=lf
+
+# Never apply line-ending conversion to binary artifacts.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary

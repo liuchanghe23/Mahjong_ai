@@ -13,7 +13,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts/training/stage1"))
     parser.add_argument("--candidates", type=int, default=24)
     parser.add_argument("--search-seed", type=int, default=20260803)
-    parser.add_argument("--workers", type=int, default=max(1, min(7, (os.cpu_count() or 2) - 1)))
+    parser.add_argument("--workers", type=int, default=max(1, min(10, (os.cpu_count() or 2) - 1)))
     parser.add_argument("--budgets", type=int, nargs="+", default=None)
     parser.add_argument("--keep-ratio", type=float, default=0.25)
     parser.add_argument("--bootstrap-samples", type=int, default=1000)
