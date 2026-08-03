@@ -41,3 +41,31 @@
 ```
 
 下一阶段将在此Schema上增加候选采样、分阶段淘汰、结果清单和断点恢复，不需要重新定义参数边界。
+
+## 并行随机搜索
+
+`scripts/train.py`实现确定性随机采样和Successive Halving。默认生成24个候选，使用7个进程并行评测，在60、300、600场后保留前25%。候选始终包含手工初始参数，并按平均顺位改善、点差改善、候选哈希依次排序。
+
+```powershell
+.\.venv\Scripts\python scripts\train.py
+```
+
+每个候选配置、每阶段JSON/Markdown报告、阶段排名、运行清单和最终摘要都会立即写入`artifacts/training/stage1/`。相同输出目录再次运行时读取manifest并跳过已经完成的候选预算，可用于中断后继续。
+
+正式训练默认要求Git工作区没有未提交修改。运行清单会记录代码提交、训练规格指纹和全部关键参数；续跑发现其中任何一项变化都会停止，避免混用不同版本的结果。开发中的一次性冒烟测试可加`--allow-dirty`。
+
+8核CPU默认使用7个工作进程。内存不足时可降低并行度：
+
+```powershell
+.\.venv\Scripts\python scripts\train.py --workers 4
+```
+
+快速验证进程与输出流程可使用：
+
+```powershell
+.\.venv\Scripts\python scripts\train.py `
+  --candidates 2 --budgets 6 --workers 2 `
+  --bootstrap-samples 200 `
+  --output-dir artifacts/training/smoke `
+  --allow-dirty
+```
