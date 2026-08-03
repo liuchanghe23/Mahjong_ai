@@ -69,3 +69,13 @@
   --output-dir artifacts/training/smoke `
   --allow-dirty
 ```
+
+## 三参数单变量消融
+
+`configs/training/group-weight-ablation.yaml`定义13个确定性候选：`1/1/1`基线，以及结构、价值、风险各自4个非基线水平。每个非基线候选只改变一个参数，统一使用300个镜像配对种子，不进行早期淘汰。
+
+```powershell
+.\.venv\Scripts\python scripts\ablate_group_weights.py
+```
+
+默认使用7个工作进程，输出到`artifacts/training/group-weight-ablation-v1/`。其中`summary.md`按参数给出趋势表，`summary.json`保留完整机器可读结果。重复运行同一命令会跳过已经完成的候选；正式运行同样要求Git工作区干净。

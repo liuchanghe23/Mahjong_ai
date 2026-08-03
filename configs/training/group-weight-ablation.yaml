@@ -1,0 +1,11 @@
+version: 1
+name: group-weight-one-factor-ablation
+training_spec: stage1-search.yaml
+budget: 300
+bootstrap_samples: 2000
+bootstrap_seed: 20260810
+
+levels:
+  shape_group: [0.50, 0.75, 1.00, 1.25, 1.50]
+  value_group: [0.50, 0.75, 1.00, 1.25, 1.50]
+  risk_group: [0.70, 0.85, 1.00, 1.15, 1.30]
