@@ -95,6 +95,7 @@ class ComparisonResult:
             "game_mode": self.game_mode,
             "base_seed": self.base_seed,
             "match_count": self.match_count,
+            "physical_match_count": self.match_count * 2,
             "seats_per_engine": self.seats_per_engine,
             "stats": {name: stats.to_dict() for name, stats in self.stats.items()},
             "paired_matches": list(self.paired_matches),
@@ -127,8 +128,9 @@ class ComparisonResult:
             f"# {headers[0]} vs {headers[1]} 固定种子对比",
             "",
             f"- 模式：`{self.game_mode}`",
-            f"- 对局数：{self.match_count}",
-            f"- 每局席位：每个引擎{self.seats_per_engine}席，逐局轮换",
+            f"- 配对种子数：{self.match_count}",
+            f"- 实际对局数：{self.match_count * 2}",
+            f"- 每局席位：每个引擎{self.seats_per_engine}席；每个种子进行A/B席位镜像互换",
             f"- 种子：`{self.base_seed}` 至 `{self.base_seed + self.match_count - 1}`",
             "",
             f"| 指标 | {headers[0]} | {headers[1]} |",
@@ -145,8 +147,8 @@ class ComparisonResult:
             *(f"| {name} | {value['estimate']:.4f} | [{value['ci_low']:.4f}, {value['ci_high']:.4f}] |"
               for name, value in (self.paired_deltas or {}).items()),
             "",
-            "> 两组模型在同一牌局中直接竞争，并通过逐局轮换减少座位偏差。",
-            f"> 置信区间按对局配对重采样 {self.bootstrap_samples} 次（随机种子 {self.bootstrap_seed}）。",
+            "> 每个种子运行两局：第二局完全互换A/B席位，镜像对作为一个统计样本。",
+            f"> 置信区间按种子镜像对重采样 {self.bootstrap_samples} 次（随机种子 {self.bootstrap_seed}）。",
             "",
         ]
         path.write_text("\n".join(lines), encoding="utf-8")
@@ -221,32 +223,36 @@ def run_comparison(
         # Cycle through all C(4, 2)=6 seat pairs so A appears both adjacent
         # and opposite, and occupies every seat equally over a full cycle.
         seat_pairs = ((0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3))
-        a_seats = set(seat_pairs[offset % len(seat_pairs)])
-        labels = [engine_a_name if pid in a_seats else engine_b_name for pid in range(4)]
-        env = RiichiEnv(game_mode=game_mode, seed=seed, rule=GameRule.default_mjsoul())
-        engines = {pid: factories[labels[pid]](pid, seed) for pid in range(4)}
-        timings = {pid: DecisionTiming() for pid in range(4)}
-        observations = env.reset()
-        while not env.done():
-            actions = {}
-            for pid, observation in observations.items():
-                started = perf_counter_ns()
-                action = engines[pid].act(observation)
-                timings[pid].add(perf_counter_ns() - started)
-                actions[pid] = require_legal_action(observation, action)
-            observations = env.step(actions)
+        original_a_seats = set(seat_pairs[offset % len(seat_pairs)])
+        paired_players: dict[str, list[Any]] = {name: [] for name in names}
+        for a_seats in (original_a_seats, set(range(4)) - original_a_seats):
+            labels = [engine_a_name if pid in a_seats else engine_b_name for pid in range(4)]
+            env = RiichiEnv(game_mode=game_mode, seed=seed, rule=GameRule.default_mjsoul())
+            engines = {pid: factories[labels[pid]](pid, seed) for pid in range(4)}
+            timings = {pid: DecisionTiming() for pid in range(4)}
+            observations = env.reset()
+            while not env.done():
+                actions = {}
+                for pid, observation in observations.items():
+                    started = perf_counter_ns()
+                    action = engines[pid].act(observation)
+                    timings[pid].add(perf_counter_ns() - started)
+                    actions[pid] = require_legal_action(observation, action)
+                observations = env.step(actions)
 
-        players = extract_player_stats(
-            list(env.mjai_log), tuple(env.scores()), tuple(env.ranks()), timings
-        )
-        for name in names:
-            team = [player for player in players if labels[player.player_id] == name]
-            grouped[name].append(team)
+            players = extract_player_stats(
+                list(env.mjai_log), tuple(env.scores()), tuple(env.ranks()), timings
+            )
+            for name in names:
+                team = [player for player in players if labels[player.player_id] == name]
+                grouped[name].append(team)
+                paired_players[name].extend(team)
         paired_matches.append({
             "seed": seed,
-            "a_seats": sorted(a_seats),
-            engine_a_name: _team_metrics(grouped[engine_a_name][-1]),
-            engine_b_name: _team_metrics(grouped[engine_b_name][-1]),
+            "a_seats": sorted(original_a_seats),
+            "mirrored_a_seats": sorted(set(range(4)) - original_a_seats),
+            engine_a_name: _team_metrics(paired_players[engine_a_name]),
+            engine_b_name: _team_metrics(paired_players[engine_b_name]),
         })
 
     deltas = _paired_bootstrap(
